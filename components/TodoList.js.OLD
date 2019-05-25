@@ -1,0 +1,114 @@
+import React from "react";
+import { Text, TouchableHighlight, StyleSheet } from "react-native";
+import SortableListView from "react-native-sortable-listview";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { View, Button, Icon, Fab } from "native-base";
+
+let data = {
+  Anna: { text: "Anna" },
+  e: { text: "è" },
+  superbella: { text: "superbella" },
+  anzi: { text: "anzi" },
+  di: { text: "di" },
+  più: { text: "più" }
+};
+
+let order = Object.keys(data);
+
+class RowComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      favourited: false
+    };
+  }
+
+  toggleFavourite = () => {
+    if (this.state.favourited === false) {
+      this.setState({
+        favourited: true
+      });
+    }
+    if (this.state.favourited === true) {
+      this.setState({
+        favourited: false
+      });
+    }
+  };
+
+  render() {
+    const { favourited } = this.state;
+
+    return (
+      <TouchableHighlight
+        underlayColor={"#eee"}
+        style={styles.listItem}
+        {...this.props.sortHandlers}
+      >
+        <>
+          <Text>{this.props.data.text}</Text>
+          <Button transparent dark>
+            {favourited ? (
+              <Ionicons
+                name="md-star"
+                size={30}
+                color="black"
+                onPress={this.toggleFavourite}
+              />
+            ) : (
+              <Ionicons
+                name="md-star-outline"
+                size={30}
+                color="black"
+                onPress={this.toggleFavourite}
+              />
+            )}
+          </Button>
+          <Button transparent danger>
+            <MaterialCommunityIcons name="delete" size={30} color="red" />
+          </Button>
+        </>
+      </TouchableHighlight>
+    );
+  }
+}
+
+class GlobalTodosList extends React.Component {
+  render() {
+    return (
+      <>
+        <SortableListView
+          style={styles.container}
+          data={data}
+          order={order}
+          moveOnPressIn={false}
+          onRowMoved={e => {
+            order.splice(e.to, 0, order.splice(e.from, 1)[0]);
+            this.forceUpdate();
+          }}
+          renderRow={row => <RowComponent data={row} />}
+        />
+        <Fab style={{ backgroundColor: "#5067FF" }} position="bottomRight">
+          <Icon name="add" />
+        </Fab>
+      </>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  listItem: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 25,
+    backgroundColor: "#F8F8F8",
+    borderBottomWidth: 1,
+    borderColor: "#eee"
+  }
+});
+
+export default GlobalTodosList;
